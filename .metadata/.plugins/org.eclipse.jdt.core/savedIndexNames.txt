@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+/home/aagaaz/lp_5_assignments/my_assignments/.metadata/.plugins/org.eclipse.jdt.core
+1171805478.index
+1865797976.index
+1402089441.index

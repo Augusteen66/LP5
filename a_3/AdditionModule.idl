@@ -1,0 +1,9 @@
+module AdditionModule {
+
+    interface Addition {
+
+        double add(in double num1, in double num2);
+
+    };
+
+};

@@ -1,0 +1,71 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+
+class TokenRingProcess implements Runnable {
+    private final int id;
+    private final List<TokenRingProcess> processes;
+    private final Semaphore mutex;
+    private boolean hasToken;
+
+    public TokenRingProcess(int id, List<TokenRingProcess> processes, Semaphore mutex) {
+        this.id = id;
+        this.processes = processes;
+        this.mutex = mutex;
+        this.hasToken = false;
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                mutex.acquire(); // Entering critical section
+
+                // Check if it has the token
+                if (hasToken) {
+                    System.out.println("Process " + id + " is in the critical section.");
+
+                    // Simulate critical section execution
+                    Thread.sleep(1000);
+
+                    // Release the token and pass it to the next process
+                    hasToken = false;
+                    TokenRingProcess nextProcess = processes.get((id + 1) % processes.size());
+                    nextProcess.requestToken();
+
+                    System.out.println("Process " + id + " has released the token.");
+                }
+
+                mutex.release(); // Exiting critical section
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void requestToken() {
+        hasToken = true;
+    }
+}
+
+public class TokenRingExample {
+    public static void main(String[] args) {
+        int numProcesses = 3;
+
+        // Create a list of processes
+        List<TokenRingProcess> processes = new ArrayList<>();
+        Semaphore mutex = new Semaphore(1);
+
+        for (int i = 0; i < numProcesses; i++) {
+            TokenRingProcess process = new TokenRingProcess(i, processes, mutex);
+            processes.add(process);
+
+            Thread thread = new Thread(process);
+            thread.start();
+        }
+
+        // The first process starts with the token
+        TokenRingProcess firstProcess = processes.get(0);
+        firstProcess.requestToken();
+    }
+}
